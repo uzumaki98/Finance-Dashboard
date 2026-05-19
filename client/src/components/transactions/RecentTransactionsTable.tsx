@@ -4,16 +4,38 @@ import { Card } from '../ui/Card';
 import { Spinner } from '../ui/Spinner';
 import { fmtINR } from '../../api/client';
 
+type SortDir = 'asc' | 'desc' | null;
+
+function SortIcon({ dir }: { dir: SortDir }) {
+  return (
+    <span className="inline-flex flex-col ml-1 leading-none">
+      <span className={`text-[9px] ${dir === 'asc'  ? 'text-indigo-600' : 'text-slate-300'}`}>▲</span>
+      <span className={`text-[9px] ${dir === 'desc' ? 'text-indigo-600' : 'text-slate-300'}`}>▼</span>
+    </span>
+  );
+}
+
 export function RecentTransactionsTable({ month }: { month: string }) {
   const { data, isLoading } = useTransactions({ month, limit: 500 });
   const del = useDeleteTransaction();
-  const [query, setQuery] = useState('');
+  const [query, setQuery]   = useState('');
+  const [sortDir, setSortDir] = useState<SortDir>(null);
+
+  function cycleSort() {
+    setSortDir((d) => d === null ? 'desc' : d === 'desc' ? 'asc' : null);
+  }
 
   const filtered = query.trim()
-    ? (data ?? []).filter((t) =>
-        t.description.toLowerCase().includes(query.toLowerCase())
-      )
+    ? (data ?? []).filter((t) => t.description.toLowerCase().includes(query.toLowerCase()))
     : (data ?? []);
+
+  const sorted = sortDir === null
+    ? filtered
+    : [...filtered].sort((a, b) =>
+        sortDir === 'desc'
+          ? b.amountPaise - a.amountPaise
+          : a.amountPaise - b.amountPaise
+      );
 
   return (
     <Card title="Recent Transactions">
@@ -40,7 +62,7 @@ export function RecentTransactionsTable({ month }: { month: string }) {
         )}
       </div>
 
-      {isLoading ? <Spinner /> : filtered.length === 0 ? (
+      {isLoading ? <Spinner /> : sorted.length === 0 ? (
         <p className="text-sm text-slate-500">
           {query ? `No transactions matching "${query}".` : 'No transactions for this month.'}
         </p>
@@ -53,16 +75,23 @@ export function RecentTransactionsTable({ month }: { month: string }) {
                   <th className="py-2 pr-4 font-medium">Date</th>
                   <th className="py-2 pr-4 font-medium">Description</th>
                   <th className="py-2 pr-4 font-medium">Category</th>
-                  <th className="py-2 pr-4 font-medium text-right">Amount</th>
+                  <th className="py-2 pr-4 font-medium text-right">
+                    <button
+                      onClick={cycleSort}
+                      className="inline-flex items-center hover:text-indigo-600 transition-colors"
+                      title={sortDir === null ? 'Sort by amount' : sortDir === 'desc' ? 'Sort ascending' : 'Clear sort'}
+                    >
+                      Amount
+                      <SortIcon dir={sortDir} />
+                    </button>
+                  </th>
                   <th className="py-2 pr-2"></th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((t) => {
+                {sorted.map((t) => {
                   const isExpense = t.amountPaise < 0;
-                  const desc = query
-                    ? highlightMatch(t.description, query)
-                    : t.description;
+                  const desc = query ? highlightMatch(t.description, query) : t.description;
                   return (
                     <tr key={t.id} className="border-b border-slate-100 last:border-0">
                       <td className="py-2 pr-4 text-slate-700 whitespace-nowrap">{t.occurredOn}</td>
@@ -98,9 +127,10 @@ export function RecentTransactionsTable({ month }: { month: string }) {
               </tbody>
             </table>
           </div>
-          {query && (
+          {(query || sortDir) && (
             <p className="mt-2 text-xs text-slate-400">
-              {filtered.length} of {data?.length ?? 0} transactions
+              {sorted.length} of {data?.length ?? 0} transactions
+              {sortDir && <span> · sorted by amount {sortDir === 'desc' ? '(high → low)' : '(low → high)'}</span>}
             </p>
           )}
         </>
