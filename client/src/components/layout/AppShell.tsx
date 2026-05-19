@@ -11,6 +11,16 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="max-w-6xl mx-auto px-4 py-6">{children}</main>
+      <footer className="max-w-6xl mx-auto px-4 py-4 border-t border-slate-200 text-xs text-slate-400 flex justify-end">
+        <a
+          href="/README.md"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:text-indigo-600 underline underline-offset-2"
+        >
+          Help / README
+        </a>
+      </footer>
     </div>
   );
 }
