@@ -9,6 +9,7 @@ import { categoriesRouter } from './routes/categories.js';
 import { transactionsRouter } from './routes/transactions.js';
 import { budgetsRouter } from './routes/budgets.js';
 import { reportsRouter } from './routes/reports.js';
+import { alertsRouter } from './routes/alerts.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const readmePath = resolve(here, '../../..', 'README.md');
@@ -27,6 +28,7 @@ app.use('/api/categories', categoriesRouter);
 app.use('/api/transactions', transactionsRouter);
 app.use('/api/budgets', budgetsRouter);
 app.use('/api/reports', reportsRouter);
+app.use('/api/alerts', alertsRouter);
 
 app.use(errorHandler);
 

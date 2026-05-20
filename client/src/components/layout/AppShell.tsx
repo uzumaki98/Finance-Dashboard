@@ -1,22 +1,25 @@
 import type { ReactNode } from 'react';
 import { MonthPicker } from './MonthPicker';
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({ children }: Readonly<{ children: ReactNode }>) {
   return (
-    <div className="min-h-full">
-      <header className="bg-white border-b border-slate-200">
+    <div className="min-h-full flex flex-col">
+      <header className="glass-header sticky top-0 z-30">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-slate-800">Finance Dashboard</h1>
+          <div className="flex items-center gap-2">
+            <span className="text-violet-500 text-xl">◈</span>
+            <h1 className="text-base font-semibold text-slate-700 tracking-wide">Finance Dashboard</h1>
+          </div>
           <MonthPicker />
         </div>
       </header>
-      <main className="max-w-6xl mx-auto px-4 py-6">{children}</main>
-      <footer className="max-w-6xl mx-auto px-4 py-4 border-t border-slate-200 text-xs text-slate-400 flex justify-end">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 py-8">{children}</main>
+      <footer className="max-w-6xl mx-auto w-full px-4 py-4 border-t border-slate-200/60 text-xs text-slate-400 flex justify-end">
         <a
           href="/README.md"
           target="_blank"
           rel="noopener noreferrer"
-          className="hover:text-indigo-600 underline underline-offset-2"
+          className="hover:text-violet-500 transition-colors underline underline-offset-2"
         >
           Help / README
         </a>

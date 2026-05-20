@@ -1,6 +1,29 @@
 import { pool } from '../db.js';
 import { monthBounds } from '../schemas/index.js';
 
+export async function incomeSavingsHistory(anchorMonth: string, n: number) {
+  const rows = [];
+  let [y, m] = anchorMonth.split('-').map(Number);
+  for (let i = n - 1; i >= 0; i--) {
+    let my = y, mm = m - i;
+    while (mm <= 0) { mm += 12; my--; }
+    const ym = `${my}-${String(mm).padStart(2, '0')}`;
+    const { start, nextStart } = monthBounds(ym);
+    const { rows: r } = await pool.query(
+      `SELECT
+         COALESCE(SUM(CASE WHEN amount_paise > 0 THEN  amount_paise ELSE 0 END), 0)::bigint AS "incomePaise",
+         COALESCE(SUM(CASE WHEN amount_paise < 0 THEN -amount_paise ELSE 0 END), 0)::bigint AS "expensePaise"
+       FROM transactions
+       WHERE occurred_on >= $1 AND occurred_on < $2`,
+      [start, nextStart],
+    );
+    const inc = Number(r[0].incomePaise);
+    const exp = Number(r[0].expensePaise);
+    rows.push({ month: ym, incomePaise: inc, expensePaise: exp, savingsPaise: inc - exp });
+  }
+  return rows;
+}
+
 export async function monthlySpend(month: string) {
   const { start, nextStart } = monthBounds(month);
   const { rows } = await pool.query(

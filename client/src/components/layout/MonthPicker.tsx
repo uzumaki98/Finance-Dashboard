@@ -19,13 +19,13 @@ export function useSelectedMonth(): [string, (m: string) => void] {
 export function MonthPicker() {
   const [month, setMonth] = useSelectedMonth();
   return (
-    <label className="flex items-center gap-2 text-sm text-slate-700">
-      <span>Month</span>
+    <label className="flex items-center gap-2 text-sm text-slate-500">
+      <span className="text-slate-400 text-xs uppercase tracking-widest">Month</span>
       <input
         type="month"
         value={month}
         onChange={(e) => setMonth(e.target.value)}
-        className="rounded-md border border-slate-300 px-2 py-1 text-sm"
+        className="rounded-lg border border-violet-200 bg-white/60 px-2 py-1 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-300/70 transition-all"
       />
     </label>
   );
