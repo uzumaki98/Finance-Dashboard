@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/tdohroo/Library/CloudStorage/OneDrive-athenahealth/Documents/Workshop/finance-dashboard && npx tsc -p client/tsconfig.json --noEmit 2>&1 | head -40 && npx tsc -p server/tsconfig.json --noEmit 2>&1 | head -40"
+          }
+        ]
+      }
+    ]
+  }
+}
